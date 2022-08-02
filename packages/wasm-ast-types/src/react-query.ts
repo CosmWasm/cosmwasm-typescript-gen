@@ -173,12 +173,25 @@ export const createReactQueryHook = ({
                                                     '!',
                                                     t.unaryExpression('!', t.identifier('client'))
                                                 ),
-                                                t.optionalMemberExpression(
-                                                    t.identifier('options'),
-                                                    t.identifier('enabled'),
-                                                    false,
-                                                    true
+                                                t.conditionalExpression(
+                                                    // explicitly check for undefined
+                                                    t.binaryExpression(
+                                                        '!=',
+                                                        t.optionalMemberExpression(
+                                                            t.identifier('options'),
+                                                            t.identifier('enabled'),
+                                                            false,
+                                                            true
+                                                        ),
+                                                        t.identifier('undefined')
+                                                    ),
+                                                    t.memberExpression(
+                                                        t.identifier('options'),
+                                                        t.identifier('enabled')
+                                                    ),
+                                                    t.booleanLiteral(true)
                                                 )
+
                                             )),
                                     ])
                                     : t.identifier('options'),
