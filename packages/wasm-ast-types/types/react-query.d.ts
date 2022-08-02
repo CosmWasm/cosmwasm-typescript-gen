@@ -18,6 +18,7 @@ interface ReactQueryHookQuery {
 
 export declare interface ReactQueryOptions {
     optionalClient?: boolean
+    v4?: boolean
 }
 export declare const createReactQueryHooks: ({ queryMsg, contractName, QueryClient, options }: ReactQueryHooks) => any;
 export declare const createReactQueryHook: ({ hookName, hookParamsTypeName, responseType, hookKeyName, methodName, jsonschema }: ReactQueryHookQuery) => t.ExportNamedDeclaration;

@@ -9,14 +9,16 @@ import {
 } from './utils'
 import { typeRefOrOptionalUnion, propertySignature, optionalConditionalExpression } from './utils/babel';
 import { getPropertyType } from './utils/types';
-
+import type { Expression } from '@babel/types'
 
 export interface ReactQueryOptions {
     optionalClient?: boolean
+    v4?: boolean
 }
 
 const DEFAULT_OPTIONS: ReactQueryOptions = {
-    optionalClient: false
+    optionalClient: false,
+    v4: false
 }
 
 
@@ -41,8 +43,10 @@ export const createReactQueryHooks = ({
     queryMsg,
     contractName,
     QueryClient,
-    options = DEFAULT_OPTIONS
+    options = {}
 }: ReactQueryHooks) => {
+    // merge the user options with the defaults
+    options = { ...DEFAULT_OPTIONS, ...options }
     return getMessageProperties(queryMsg)
         .reduce((m, schema) => {
             const underscoreName = Object.keys(schema.properties)[0];
@@ -84,8 +88,10 @@ export const createReactQueryHook = ({
     hookKeyName,
     methodName,
     jsonschema,
-    options = DEFAULT_OPTIONS,
+    options = {},
 }: ReactQueryHookQuery) => {
+    // merge the user options with the defaults
+    options = { ...DEFAULT_OPTIONS, ...options }
 
     const keys = Object.keys(jsonschema.properties ?? {});
     let args = [];
@@ -137,15 +143,9 @@ export const createReactQueryHook = ({
                         callExpression(
                             t.identifier('useQuery'),
                             [
-                                t.arrayExpression([
-                                    t.stringLiteral(hookKeyName),
-                                    t.optionalMemberExpression(
-                                        t.identifier('client'),
-                                        t.identifier('contractAddress'),
-                                        false,
-                                        options.optionalClient
-                                    ),
-                                ]),
+                                t.arrayExpression(
+                                    generateUseQueryQueryKey(hookKeyName, props, options.optionalClient)
+                                ),
                                 t.arrowFunctionExpression(
                                     [],
                                     optionalConditionalExpression(
@@ -231,8 +231,33 @@ export const createReactQueryHookInterface = ({
     hookParamsTypeName,
     responseType,
     jsonschema,
-    options = DEFAULT_OPTIONS,
+    options = {},
 }: ReactQueryHookQueryInterface) => {
+    // merge the user options with the defaults
+    options = { ...DEFAULT_OPTIONS, ...options }
+
+    const typedUseQueryOptions = t.tsTypeReference(
+        t.identifier('UseQueryOptions'),
+        t.tsTypeParameterInstantiation([
+            typeRefOrOptionalUnion(
+                t.identifier(responseType),
+                options.optionalClient
+            ),
+            t.tsTypeReference(t.identifier('Error')),
+            t.tsTypeReference(
+                t.identifier(responseType)
+            ),
+            t.tsArrayType(
+                t.tsParenthesizedType(
+                    t.tsUnionType([
+                        t.tsStringKeyword(),
+                        t.tsUndefinedKeyword()
+                    ])
+                )
+            ),
+        ])
+    )
+
     const body = [
         tsPropertySignature(
             t.identifier('client'),
@@ -246,32 +271,25 @@ export const createReactQueryHookInterface = ({
         tsPropertySignature(
             t.identifier('options'),
             t.tsTypeAnnotation(
-                t.tsTypeReference(
-                    t.identifier('UseQueryOptions'),
-                    t.tsTypeParameterInstantiation(
-                        [
-
-                            typeRefOrOptionalUnion(
-                                t.identifier(responseType),
-                                options.optionalClient
-                            ),
-                            t.tsTypeReference(t.identifier('Error')),
-                            t.tsTypeReference(
-                                t.identifier(responseType)
-                            ),
-                            t.tsArrayType(
-                                t.tsParenthesizedType(
-                                    t.tsUnionType(
-                                        [
-                                            t.tsStringKeyword(),
-                                            t.tsUndefinedKeyword()
-                                        ]
-                                    )
+                options.v4
+                    ? t.tSIntersectionType([
+                        t.tsTypeReference(
+                            t.identifier('Omit'),
+                            t.tsTypeParameterInstantiation([
+                                typedUseQueryOptions,
+                                t.tsLiteralType(t.stringLiteral("'queryKey' | 'queryFn' | 'initialData'"))
+                            ])
+                        ),
+                        t.tSTypeLiteral([
+                            t.tsPropertySignature(
+                                t.identifier('initialData?'),
+                                t.tsTypeAnnotation(
+                                    t.tsUndefinedKeyword()
                                 )
                             )
-                        ]
-                    )
-                )
+                        ])
+                    ])
+                    : typedUseQueryOptions
             ),
             true
         )
@@ -313,4 +331,29 @@ const getProps = (jsonschema, camelize) => {
             optional
         )
     });
+}
+
+function generateUseQueryQueryKey(hookKeyName: string, props: string[], optionalClient: boolean): Array<Expression> {
+    const queryKey: Array<Expression> = [
+        t.stringLiteral(hookKeyName),
+        t.optionalMemberExpression(
+            t.identifier('client'),
+            t.identifier('contractAddress'),
+            false,
+            optionalClient
+        )
+    ];
+
+    if (props.includes('args')) {
+        queryKey.push(t.callExpression(
+            t.memberExpression(
+                t.identifier('JSON'),
+                t.identifier('stringify')
+            ),
+            [
+                t.identifier('args')
+            ]
+        ))
+    }
+    return queryKey
 }
