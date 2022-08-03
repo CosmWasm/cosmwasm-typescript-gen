@@ -36,6 +36,12 @@ export default async (argv) => {
             name: 'v4',
             message: 'Use react-query v4?',
             default: false
+        },
+        {
+            type: 'confirm',
+            name: 'mutations',
+            message: 'Geneate useMutation hooks? Must be used with v4.',
+            default: false
         }
     ];
 

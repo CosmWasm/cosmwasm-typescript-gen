@@ -11,6 +11,7 @@ import { typeRefOrOptionalUnion, propertySignature, optionalConditionalExpressio
 import { getPropertyType } from './utils/types';
 import type { Expression } from '@babel/types'
 
+// TODO: this mutations boolean is not actually used here and only at a higher level
 export interface ReactQueryOptions {
     optionalClient?: boolean
     v4?: boolean
@@ -227,6 +228,22 @@ interface ReactQueryMutationHookInterface {
     useMutationTypeParameter: t.TSTypeParameterInstantiation
 }
 
+/**
+ * Example:
+```
+export interface Cw4UpdateMembersMutation {
+  client: Cw4GroupClient
+  args: {
+    tokenId: string
+    remove: string[]
+  }
+  options?: Omit<
+    UseMutationOptions<ExecuteResult, Error, Pick<Cw4UpdateMembersMutation, 'args'>>,
+    'mutationFn'
+  >
+}
+```
+ */
 export const createReactQueryMutationArgsInterface = ({
     ExecuteClient,
     mutationHookParamsTypeName,
@@ -327,6 +344,7 @@ export const createReactQueryMutationHooks = ({
                 );
             });
 
+            // <ExecuteResult, Error, Pick<Cw4UpdateMembersMutation, 'args'>>
             const useMutationTypeParameter = t.tsTypeParameterInstantiation([
                 // Data
                 t.tSTypeReference(
@@ -365,28 +383,6 @@ export const createReactQueryMutationHooks = ({
 };
 
 
-
-/*
-export interface Cw4UpdateMembersMutation {
-  client: Cw4GroupClient
-  args: {
-    tokenId: string
-    remove: string[]
-  }
-  options?: Omit<
-    UseMutationOptions<ExecuteResult, Error, Pick<Cw4UpdateMembersMutation, 'args'>>,
-    'mutationFn'
-  >
-}
-
-export const useCw4UpdateMembersMutation = ({ client, options }: Omit<Cw4UpdateMembersMutation, 'args'>) =>
-  useMutation<ExecuteResult, Error, Pick<Cw4UpdateMembersMutation, 'args'>>(
-    ({ args }) => client.updateMembers(args),
-    options
-  )
-
-*/
-
 interface ReactQueryMutationHook {
     mutationHookName: string;
     mutationHookParamsTypeName: string;
@@ -395,6 +391,17 @@ interface ReactQueryMutationHook {
     execArgs: t.ObjectProperty[]
 }
 
+/**
+ *
+ * Example:
+```
+export const useCw4UpdateMembersMutation = ({ client, options }: Omit<Cw4UpdateMembersMutation, 'args'>) =>
+  useMutation<ExecuteResult, Error, Pick<Cw4UpdateMembersMutation, 'args'>>(
+    ({ args }) => client.updateMembers(args),
+    options
+  )
+```
+ */
 export const createReactQueryMutationHook = ({
     mutationHookName,
     mutationHookParamsTypeName,
@@ -498,6 +505,7 @@ export const createReactQueryMutationHook = ({
     )
 
 };
+
 
 interface ReactQueryHookQueryInterface {
     QueryClient: string;
