@@ -20,7 +20,7 @@ export function useCwCodeIdRegistryListRegistrationsQuery({
   args,
   options
 }: CwCodeIdRegistryListRegistrationsQuery) {
-  return useQuery<ListRegistrationsResponse, Error, ListRegistrationsResponse, (string | undefined)[]>(["cwCodeIdRegistryListRegistrations", client.contractAddress], () => client.listRegistrations({
+  return useQuery<ListRegistrationsResponse, Error, ListRegistrationsResponse, (string | undefined)[]>(["cwCodeIdRegistryListRegistrations", client.contractAddress, JSON.stringify(args)], () => client.listRegistrations({
     chainId: args.chainId,
     name: args.name
   }), options);
@@ -38,7 +38,7 @@ export function useCwCodeIdRegistryInfoForCodeIdQuery({
   args,
   options
 }: CwCodeIdRegistryInfoForCodeIdQuery) {
-  return useQuery<InfoForCodeIdResponse, Error, InfoForCodeIdResponse, (string | undefined)[]>(["cwCodeIdRegistryInfoForCodeId", client.contractAddress], () => client.infoForCodeId({
+  return useQuery<InfoForCodeIdResponse, Error, InfoForCodeIdResponse, (string | undefined)[]>(["cwCodeIdRegistryInfoForCodeId", client.contractAddress, JSON.stringify(args)], () => client.infoForCodeId({
     chainId: args.chainId,
     codeId: args.codeId
   }), options);
@@ -57,7 +57,7 @@ export function useCwCodeIdRegistryGetRegistrationQuery({
   args,
   options
 }: CwCodeIdRegistryGetRegistrationQuery) {
-  return useQuery<GetRegistrationResponse, Error, GetRegistrationResponse, (string | undefined)[]>(["cwCodeIdRegistryGetRegistration", client.contractAddress], () => client.getRegistration({
+  return useQuery<GetRegistrationResponse, Error, GetRegistrationResponse, (string | undefined)[]>(["cwCodeIdRegistryGetRegistration", client.contractAddress, JSON.stringify(args)], () => client.getRegistration({
     chainId: args.chainId,
     name: args.name,
     version: args.version

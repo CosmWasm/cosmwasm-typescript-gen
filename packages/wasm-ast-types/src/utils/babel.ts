@@ -3,6 +3,8 @@ import { snake } from "case";
 import { Field, QueryMsg, ExecuteMsg } from '../types';
 import { TSTypeAnnotation, TSExpressionWithTypeArguments } from '@babel/types';
 
+
+// t.TSPropertySignature - kind?
 export const propertySignature = (
     name: string,
     typeAnnotation: t.TSTypeAnnotation,
@@ -16,7 +18,7 @@ export const propertySignature = (
     }
 };
 
-export const identifier = (name: string, typeAnnotation: t.TSTypeAnnotation, optional: boolean = false) => {
+export const identifier = (name: string, typeAnnotation: t.TSTypeAnnotation, optional: boolean = false): t.Identifier => {
     const type = t.identifier(name);
     type.typeAnnotation = typeAnnotation;
     type.optional = optional;
@@ -276,3 +278,27 @@ export const typeRefOrOptionalUnion = (identifier: t.Identifier, optional: boole
         : typeReference
 }
 
+export const parameterizedTypeReference = (identifier: string, from: t.TSType, omit: string | Array<string>) => {
+    return t.tsTypeReference(
+        t.identifier(identifier),
+        t.tsTypeParameterInstantiation([
+            from,
+            typeof omit === 'string'
+                ? t.tsLiteralType(t.stringLiteral(omit))
+                : t.tsUnionType(omit.map(o => t.tsLiteralType(t.stringLiteral(o))))
+        ])
+    )
+}
+
+/**
+ * omitTypeReference(t.tsTypeReference(t.identifier('Cw4UpdateMembersMutation'),),'args').....
+ * Omit<Cw4UpdateMembersMutation, 'args'>
+ */
+export const omitTypeReference = (from: t.TSType, omit: string | Array<string>) => {
+    return parameterizedTypeReference('Omit', from, omit)
+}
+
+
+export const pickTypeReference = (from: t.TSType, pick: string | Array<string>) => {
+    return parameterizedTypeReference('Pick', from, pick)
+}

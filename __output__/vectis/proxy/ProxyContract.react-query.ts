@@ -19,7 +19,7 @@ export function useProxyCanExecuteRelayQuery({
   args,
   options
 }: ProxyCanExecuteRelayQuery) {
-  return useQuery<CanExecuteRelayResponse, Error, CanExecuteRelayResponse, (string | undefined)[]>(["proxyCanExecuteRelay", client.contractAddress], () => client.canExecuteRelay({
+  return useQuery<CanExecuteRelayResponse, Error, CanExecuteRelayResponse, (string | undefined)[]>(["proxyCanExecuteRelay", client.contractAddress, JSON.stringify(args)], () => client.canExecuteRelay({
     sender: args.sender
   }), options);
 }

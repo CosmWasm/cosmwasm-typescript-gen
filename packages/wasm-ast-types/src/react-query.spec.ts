@@ -18,7 +18,8 @@ import tokens_response from './../../../__fixtures__/basic/tokens_response.json'
 
 import {
   createReactQueryHook,
-  createReactQueryHooks
+  createReactQueryHooks,
+  createReactQueryMutationHooks,
 } from './react-query'
 
 const expectCode = (ast) => {
@@ -68,6 +69,32 @@ it('createReactQueryHooks', () => {
         contractName: 'Sg721',
         QueryClient: 'Sg721QueryClient',
         options: { optionalClient: true }
+      }
+    )))
+  expectCode(t.program(
+    createReactQueryHooks(
+      {
+        queryMsg: query_msg,
+        contractName: 'Sg721',
+        QueryClient: 'Sg721QueryClient',
+        options: { v4: true }
+      }
+    )))
+  expectCode(t.program(
+    createReactQueryHooks(
+      {
+        queryMsg: query_msg,
+        contractName: 'Sg721',
+        QueryClient: 'Sg721QueryClient',
+        options: { optionalClient: true, v4: true }
+      }
+    )))
+  expectCode(t.program(
+    createReactQueryMutationHooks(
+      {
+        execMsg: execute_msg,
+        contractName: 'Sg721',
+        ExecuteClient: 'Sg721Client',
       }
     )))
 });

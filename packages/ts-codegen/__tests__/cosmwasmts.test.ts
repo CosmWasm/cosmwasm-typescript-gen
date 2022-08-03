@@ -14,6 +14,20 @@ it('optionalClient', async () => {
     await reactQuery('Factory', schemas, outopt, { optionalClient: true });
 })
 
+it('v4Query', async () => {
+    const outopt = OUTPUT_DIR + '/vectis/factory-opt';
+    const schemaDir = FIXTURE_DIR + '/vectis/factory/';
+    const schemas = readSchemas({ schemaDir, argv: {} });
+    await reactQuery('Factory', schemas, outopt, { v4: true });
+})
+
+it('useMutations', async () => {
+    const outopt = OUTPUT_DIR + '/vectis/factory-opt';
+    const schemaDir = FIXTURE_DIR + '/vectis/factory/';
+    const schemas = readSchemas({ schemaDir, argv: {} });
+    await reactQuery('Factory', schemas, outopt, { v4: true, mutations: true });
+})
+
 it('vectis/factory', async () => {
     const out = OUTPUT_DIR + '/vectis/factory';
     const outopt = OUTPUT_DIR + '/vectis/factory-opt';
