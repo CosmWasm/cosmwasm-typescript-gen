@@ -1064,126 +1064,102 @@ export function useSg721OwnerOfQuery({
 exports[`createReactQueryHooks 6`] = `
 "export interface Sg721BurnMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721BurnMutation, \\"args\\">>, \\"mutationFn\\">;
   args: {
     tokenId: string;
   };
 }
-export function useSg721BurnMutation({
-  client,
-  options
-}: Omit<Sg721BurnMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721BurnMutation, \\"args\\">>(({
+export function useSg721BurnMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721BurnMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721BurnMutation>(({
+    client,
     args
   }) => client.burn(args), options);
 }
 export interface Sg721MintMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721MintMutation, \\"args\\">>, \\"mutationFn\\">;
   args: MintMsgForEmpty;
 }
-export function useSg721MintMutation({
-  client,
-  options
-}: Omit<Sg721MintMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721MintMutation, \\"args\\">>(({
+export function useSg721MintMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721MintMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721MintMutation>(({
+    client,
     args
   }) => client.mint(args), options);
 }
 export interface Sg721RevokeAllMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721RevokeAllMutation, \\"args\\">>, \\"mutationFn\\">;
   args: {
     operator: string;
   };
 }
-export function useSg721RevokeAllMutation({
-  client,
-  options
-}: Omit<Sg721RevokeAllMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721RevokeAllMutation, \\"args\\">>(({
+export function useSg721RevokeAllMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721RevokeAllMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721RevokeAllMutation>(({
+    client,
     args
   }) => client.revokeAll(args), options);
 }
 export interface Sg721ApproveAllMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721ApproveAllMutation, \\"args\\">>, \\"mutationFn\\">;
   args: {
     expires?: Expiration;
     operator: string;
   };
 }
-export function useSg721ApproveAllMutation({
-  client,
-  options
-}: Omit<Sg721ApproveAllMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721ApproveAllMutation, \\"args\\">>(({
+export function useSg721ApproveAllMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721ApproveAllMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721ApproveAllMutation>(({
+    client,
     args
   }) => client.approveAll(args), options);
 }
 export interface Sg721RevokeMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721RevokeMutation, \\"args\\">>, \\"mutationFn\\">;
   args: {
     spender: string;
     tokenId: string;
   };
 }
-export function useSg721RevokeMutation({
-  client,
-  options
-}: Omit<Sg721RevokeMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721RevokeMutation, \\"args\\">>(({
+export function useSg721RevokeMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721RevokeMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721RevokeMutation>(({
+    client,
     args
   }) => client.revoke(args), options);
 }
 export interface Sg721ApproveMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721ApproveMutation, \\"args\\">>, \\"mutationFn\\">;
   args: {
     expires?: Expiration;
     spender: string;
     tokenId: string;
   };
 }
-export function useSg721ApproveMutation({
-  client,
-  options
-}: Omit<Sg721ApproveMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721ApproveMutation, \\"args\\">>(({
+export function useSg721ApproveMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721ApproveMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721ApproveMutation>(({
+    client,
     args
   }) => client.approve(args), options);
 }
 export interface Sg721SendNftMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721SendNftMutation, \\"args\\">>, \\"mutationFn\\">;
   args: {
     contract: string;
     msg: Binary;
     tokenId: string;
   };
 }
-export function useSg721SendNftMutation({
-  client,
-  options
-}: Omit<Sg721SendNftMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721SendNftMutation, \\"args\\">>(({
+export function useSg721SendNftMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721SendNftMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721SendNftMutation>(({
+    client,
     args
   }) => client.sendNft(args), options);
 }
 export interface Sg721TransferNftMutation {
   client: Sg721Client;
-  options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721TransferNftMutation, \\"args\\">>, \\"mutationFn\\">;
   args: {
     recipient: string;
     tokenId: string;
   };
 }
-export function useSg721TransferNftMutation({
-  client,
-  options
-}: Omit<Sg721TransferNftMutation, \\"args\\">) {
-  return useMutation<ExecuteResult, Error, Pick<Sg721TransferNftMutation, \\"args\\">>(({
+export function useSg721TransferNftMutation(options?: Omit<UseMutationOptions<ExecuteResult, Error, Sg721TransferNftMutation>, \\"mutationFn\\">) {
+  return useMutation<ExecuteResult, Error, Sg721TransferNftMutation>(({
+    client,
     args
   }) => client.transferNft(args), options);
 }"
