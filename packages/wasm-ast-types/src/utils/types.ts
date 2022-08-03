@@ -281,13 +281,6 @@ export const createTypedObjectParams = (jsonschema: any, camelize: boolean = tru
     );
 
     obj.typeAnnotation = getParamsTypeAnnotation(jsonschema, camelize)
-    // obj.typeAnnotation = t.tsTypeAnnotation(
-    //     t.tsTypeLiteral(
-    //         [
-    //             ...typedParams
-    //         ]
-    //     )
-    // );
 
     return obj;
 };

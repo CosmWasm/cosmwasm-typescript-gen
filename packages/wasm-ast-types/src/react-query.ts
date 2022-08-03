@@ -225,9 +225,10 @@ interface ReactQueryMutationHookInterface {
     ExecuteClient: string
     mutationHookParamsTypeName: string;
     jsonschema: any
-    properties: any
     useMutationTypeParameter: t.TSTypeParameterInstantiation
 }
+
+
 
 /**
  * Example:
@@ -248,12 +249,10 @@ export interface Cw4UpdateMembersMutation {
 export const createReactQueryMutationArgsInterface = ({
     ExecuteClient,
     mutationHookParamsTypeName,
+    useMutationTypeParameter,
     jsonschema,
-    properties,
-    useMutationTypeParameter
 }: ReactQueryMutationHookInterface) => {
-
-    const typedUseMutationOptions = t.tsTypeReference(
+  const typedUseMutationOptions = t.tsTypeReference(
         t.identifier('UseMutationOptions'),
         useMutationTypeParameter
     )
@@ -292,9 +291,11 @@ export const createReactQueryMutationArgsInterface = ({
   // TODO: this should not have to be done manually.
   if (!argsType && jsonschema?.$ref?.startsWith('#/definitions/')) {
     let refName = jsonschema?.$ref
+
     if (/_for_[A-Z]/.test(refName)) {
       refName = refName.replace(/_for_/, 'For');
     }
+
     argsType = t.tsTypeAnnotation(getTypeFromRef(refName))
   }
 
@@ -347,48 +348,26 @@ export const createReactQueryMutationHooks = ({
 
             const properties = jsonschema.properties ?? {};
 
-            // add, remove
-            const execArgs: t.ObjectProperty[] = Object.keys(properties).map(prop => {
-                return t.objectProperty(
-                    t.identifier(prop),
-                    t.identifier(camel(prop)),
-                    false,
-                    prop === camel(prop) // only use shorthand if the name is the same camel-cased
-                );
-            });
+            // TODO: there should be a better way to do this
+            const hasArgs = !!(Object.keys(properties)?.length || jsonschema?.$ref)
 
-            // <ExecuteResult, Error, Pick<Cw4UpdateMembersMutation, 'args'>>
-            const useMutationTypeParameter = t.tsTypeParameterInstantiation([
-                // Data
-                t.tSTypeReference(
-                    t.identifier('ExecuteResult')
-                ),
-                // Error
-                t.tsTypeReference(
-                    t.identifier('Error')
-                ),
-                // Variables
-                pickTypeReference(
-                    t.tsTypeReference(
-                        t.identifier(mutationHookParamsTypeName)
-                    ),
-                    'args'
-                )
-            ])
+          // <ExecuteResult, Error, Pick<Cw4UpdateMembersMutation, 'args'>>
+
+            const useMutationTypeParameter = generateMutationTypeParameter(mutationHookParamsTypeName, hasArgs)
+
 
             return [
                 createReactQueryMutationArgsInterface({
                     mutationHookParamsTypeName,
                     ExecuteClient,
                     jsonschema,
-                    properties,
                     useMutationTypeParameter
                 }),
                 createReactQueryMutationHook({
                     execMethodName,
                     mutationHookName,
                     mutationHookParamsTypeName,
-                    execArgs,
+                    hasArgs,
                     useMutationTypeParameter,
                 }),
                 ...m,
@@ -396,13 +375,39 @@ export const createReactQueryMutationHooks = ({
         }, []);
 };
 
+/**
+ * Generates the mutation type parameter. If args exist, we use a pick. If not, we just return the params type.
+ */
+function generateMutationTypeParameter(mutationHookParamsTypeName: string, hasArgs: boolean) {
+  const paramsTypeReference = t.tsTypeReference(
+    t.identifier(mutationHookParamsTypeName)
+  );
+  return t.tsTypeParameterInstantiation([
+    // Data
+    t.tSTypeReference(
+      t.identifier('ExecuteResult')
+    ),
+    // Error
+    t.tsTypeReference(
+      t.identifier('Error')
+    ),
+    // Variables
+    hasArgs
+      ? pickTypeReference(
+        paramsTypeReference,
+        'args'
+      )
+      : paramsTypeReference
+  ]);
+}
+
 
 interface ReactQueryMutationHook {
     mutationHookName: string;
     mutationHookParamsTypeName: string;
     execMethodName: string;
     useMutationTypeParameter: t.TSTypeParameterInstantiation
-    execArgs: t.ObjectProperty[]
+    hasArgs: boolean
 }
 
 /**
@@ -421,22 +426,8 @@ export const createReactQueryMutationHook = ({
     mutationHookParamsTypeName,
     execMethodName,
     useMutationTypeParameter,
-    execArgs,
+    hasArgs,
 }: ReactQueryMutationHook) => {
-
-    // Commented out in case of using execute directly
-    // const execMethodWithParams = t.objectExpression(
-    //     [
-    //         t.objectProperty(
-    //             t.identifier(execMethodUnderscoreName),
-    //             t.objectExpression([
-    //                 ...execArgs
-    //             ])
-    //         )
-
-    //     ]
-    // )
-
     return t.exportNamedDeclaration(
         t.functionDeclaration(
             t.identifier(mutationHookName),
@@ -447,12 +438,16 @@ export const createReactQueryMutationHook = ({
                         shorthandProperty('options')
                     ],
                     t.tsTypeAnnotation(
+                      hasArgs
                         // we omit the args here because we provide them in .mutate(args)
-                        omitTypeReference(
+                        ? omitTypeReference(
                             t.tsTypeReference(
                                 t.identifier(mutationHookParamsTypeName),
                             ),
                             'args'
+                        )
+                        : t.tsTypeReference(
+                          t.identifier(mutationHookParamsTypeName),
                         )
                     )
                 )
@@ -464,46 +459,23 @@ export const createReactQueryMutationHook = ({
                             t.identifier('useMutation'),
                             [
                                 t.arrowFunctionExpression(
-                                    // params
-                                    [
+                                  // params
+                                  hasArgs
+                                    ? [
                                         t.objectPattern(
-                                            [
-                                                // Commented out in case of using execute directly
-                                                // ...['client', 'sender', 'contractAddress'].map(prop => shorthandProperty(prop)),
-                                                // t.restElement(
-                                                //     t.identifier('execParams')
-                                                // )
-                                                shorthandProperty('args')
-                                            ],
+                                          [ shorthandProperty('args') ]
                                         )
-                                    ],
+                                    ]
+                                  : [],
                                     t.callExpression(
                                         t.memberExpression(
                                             t.identifier('client'),
                                             t.identifier(execMethodName)
                                         ),
-                                        [
-                                            t.identifier('args')
-                                            // Commented out in case of using execute directly
-                                            // t.objectExpression([
-                                            //     ...execArgs
-                                            // ])
-                                        ]
+                                        hasArgs
+                                          ? [ t.identifier('args') ]
+                                          : []
                                     ),
-                                    // This is commented out if we want to use the execute directly
-                                    // t.callExpression(
-                                    //     t.memberExpression(
-                                    //         t.identifier('client'),
-                                    //         t.identifier('execute')
-                                    //     ),
-                                    //     // args
-                                    //     [
-                                    //         t.identifier('sender'),
-                                    //         t.identifier('contractAddress'),
-                                    //         execMethodWithParams,
-                                    //         t.stringLiteral('auto'),
-                                    //     ]
-                                    // ),
                                     false // not async
                                 ),
                                 t.identifier('options'),
@@ -514,7 +486,6 @@ export const createReactQueryMutationHook = ({
 
                 ]
             ),
-
         )
     )
 
