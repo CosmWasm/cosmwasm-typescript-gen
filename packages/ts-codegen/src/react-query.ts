@@ -6,52 +6,75 @@ import * as w from 'wasm-ast-types';
 import * as t from '@babel/types';
 import { writeFileSync } from 'fs';
 import generate from "@babel/generator";
-import { findAndParseTypes, findQueryMsg } from "./utils";
-import { ReactQueryOptions } from "wasm-ast-types";
+import { findAndParseTypes, findExecuteMsg, findQueryMsg } from "./utils";
+import { getMessageProperties, ReactQueryOptions } from "wasm-ast-types";
 
 
 
-export default async (name: string, schemas: any[], outPath: string, options?: ReactQueryOptions) => {
+export default async (contractName: string, schemas: any[], outPath: string, options?: ReactQueryOptions) => {
 
-    const ReactQueryFile = pascal(`${name}Contract`) + '.react-query.ts';
-    const Contract = pascal(`${name}Contract`)
+    const ReactQueryFile = pascal(`${contractName}Contract`) + '.react-query.ts';
+    const Contract = pascal(`${contractName}Contract`)
 
     const QueryMsg = findQueryMsg(schemas);
+    const ExecuteMsg = findExecuteMsg(schemas);
     const typeHash = await findAndParseTypes(schemas);
 
-    let QueryClient = null;
-    let ReadOnlyInstance = null;
+    const ExecuteClient = pascal(`${contractName}Client`);
+    const QueryClient = pascal(`${contractName}QueryClient`);
 
     const body = [];
 
+    const reactQueryImports = ['useQuery', 'UseQueryOptions']
+    const clientImports = []
+
+    QueryMsg && clientImports.push(QueryClient)
+
+    // check that there are commands within the exec msg
+    const shouldGenerateMutationHooks = ExecuteMsg && options?.mutations && options?.v4 && getMessageProperties(ExecuteMsg).length > 0
+
+    if (shouldGenerateMutationHooks) {
+        body.push(w.importStmt(['ExecuteResult'], '@cosmjs/cosmwasm-stargate'));
+        reactQueryImports.push(...['UseMutationOptions', 'useMutation'])
+        clientImports.push(ExecuteClient)
+    }
+
+    // react-query imports
     body.push(
-        w.importStmt(['useQuery', 'UseQueryOptions'], options?.v4 ? '@tanstack/react-query' : 'react-query')
+        w.importStmt(reactQueryImports, options?.v4 ? '@tanstack/react-query' : 'react-query')
     );
 
-    body.push(
-        w.importStmt(Object.keys(typeHash), `./${Contract}`)
-    );
+    // general contract imports
+    body.push(w.importStmt(Object.keys(typeHash), `./${Contract}`));
+
+    // client imports
+    body.push(w.importStmt(clientImports, `./${Contract}`));
+
 
     // query messages
     if (QueryMsg) {
-
-        QueryClient = pascal(`${name}QueryClient`);
-        ReadOnlyInstance = pascal(`${name}ReadOnlyInterface`);
-
-        body.push(
-            w.importStmt([QueryClient], `./${Contract}`)
-        );
-
         [].push.apply(body,
             w.createReactQueryHooks({
                 queryMsg: QueryMsg,
-                contractName: name,
+                contractName: contractName,
                 QueryClient,
                 options
             })
         );
-
     }
+
+    if (shouldGenerateMutationHooks) {
+        [].push.apply(body,
+            w.createReactQueryMutationHooks({
+                execMsg: ExecuteMsg,
+                contractName: contractName,
+                ExecuteClient,
+                options
+            })
+        );
+    }
+
+
 
     const code = header + generate(
         t.program(body)

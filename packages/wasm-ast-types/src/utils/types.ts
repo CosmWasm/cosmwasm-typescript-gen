@@ -142,109 +142,113 @@ export const getPropertyType = (schema, prop) => {
     return { type, optional };
 };
 
-export const createTypedObjectParams = (jsonschema: any, camelize: boolean = true) => {
+function extracted(jsonschema: any, prop: string, camelize: boolean) {
+  if (jsonschema.properties[prop].type === 'object') {
+    if (jsonschema.properties[prop].title) {
+      return propertySignature(
+        camelize ? camel(prop) : prop,
+        t.tsTypeAnnotation(
+          t.tsTypeReference(t.identifier(jsonschema.properties[prop].title))
+        )
+      );
+    } else {
+      throw new Error('createTypedObjectParams() contact maintainer');
+    }
+  }
+
+  if (Array.isArray(jsonschema.properties[prop].allOf)) {
+    const isOptional = !jsonschema.required?.includes(prop);
+    const unionTypes = jsonschema.properties[prop].allOf.map(el => {
+      if (el.title) return el.title;
+      if (el.$ref) return getTypeStrFromRef(el.$ref);
+      return el.type;
+    });
+    const uniqUnionTypes = [...new Set(unionTypes)];
+
+    if (uniqUnionTypes.length === 1) {
+      return propertySignature(
+        camelize ? camel(prop) : prop,
+        t.tsTypeAnnotation(
+          t.tsTypeReference(
+            t.identifier(uniqUnionTypes[0])
+          )
+        ),
+        isOptional
+      );
+    } else {
+      return propertySignature(
+        camelize ? camel(prop) : prop,
+        t.tsTypeAnnotation(
+          t.tsUnionType(
+            uniqUnionTypes.map(typ =>
+              t.tsTypeReference(
+                t.identifier(typ)
+              )
+            )
+          )
+        ),
+        isOptional
+      );
+    }
+  } else if (Array.isArray(jsonschema.properties[prop].oneOf)) {
+    const isOptional = !jsonschema.required?.includes(prop);
+    const unionTypes = jsonschema.properties[prop].oneOf.map(el => {
+      if (el.title) return el.title;
+      if (el.$ref) return getTypeStrFromRef(el.$ref);
+      return el.type;
+    });
+    const uniqUnionTypes = [...new Set(unionTypes)];
+    if (uniqUnionTypes.length === 1) {
+      return propertySignature(
+        camelize ? camel(prop) : prop,
+        t.tsTypeAnnotation(
+          t.tsTypeReference(
+            t.identifier(uniqUnionTypes[0])
+          )
+        ),
+        isOptional
+      );
+    } else {
+      return propertySignature(
+        camelize ? camel(prop) : prop,
+        t.tsTypeAnnotation(
+          t.tsUnionType(
+            uniqUnionTypes.map(typ =>
+              t.tsTypeReference(
+                t.identifier(typ)
+              )
+            )
+          )
+        ),
+        isOptional
+      );
+    }
+
+  }
+
+  try {
+    getPropertyType(jsonschema, prop);
+  } catch (e) {
+    console.log(e);
+    console.log(jsonschema, prop);
+  }
+
+  const { type, optional } = getPropertyType(jsonschema, prop);
+  return propertySignature(
+    camelize ? camel(prop) : prop,
+    t.tsTypeAnnotation(
+      type
+    ),
+    optional
+  );
+}
+
+export const createTypedObjectParams = (jsonschema: any, camelize: boolean = true): t.ObjectPattern => {
     const keys = Object.keys(jsonschema.properties ?? {});
     if (!keys.length) return;
 
     const typedParams = keys.map(prop => {
-        if (jsonschema.properties[prop].type === 'object') {
-            if (jsonschema.properties[prop].title) {
-                return propertySignature(
-                    camelize ? camel(prop) : prop,
-                    t.tsTypeAnnotation(
-                        t.tsTypeReference(t.identifier(jsonschema.properties[prop].title))
-                    )
-                );
-            } else {
-                throw new Error('createTypedObjectParams() contact maintainer')
-            }
-        }
-
-        if (Array.isArray(jsonschema.properties[prop].allOf)) {
-            const isOptional = !jsonschema.required?.includes(prop);
-            const unionTypes = jsonschema.properties[prop].allOf.map(el => {
-                if (el.title) return el.title;
-                if (el.$ref) return getTypeStrFromRef(el.$ref);
-                return el.type;
-            });
-            const uniqUnionTypes = [...new Set(unionTypes)];
-
-            if (uniqUnionTypes.length === 1) {
-                return propertySignature(
-                    camelize ? camel(prop) : prop,
-                    t.tsTypeAnnotation(
-                        t.tsTypeReference(
-                            t.identifier(uniqUnionTypes[0])
-                        )
-                    ),
-                    isOptional
-                );
-            } else {
-                return propertySignature(
-                    camelize ? camel(prop) : prop,
-                    t.tsTypeAnnotation(
-                        t.tsUnionType(
-                            uniqUnionTypes.map(typ =>
-                                t.tsTypeReference(
-                                    t.identifier(typ)
-                                )
-                            )
-                        )
-                    ),
-                    isOptional
-                );
-            }
-        } else if (Array.isArray(jsonschema.properties[prop].oneOf)) {
-            const isOptional = !jsonschema.required?.includes(prop);
-            const unionTypes = jsonschema.properties[prop].oneOf.map(el => {
-                if (el.title) return el.title;
-                if (el.$ref) return getTypeStrFromRef(el.$ref);
-                return el.type;
-            });
-            const uniqUnionTypes = [...new Set(unionTypes)];
-            if (uniqUnionTypes.length === 1) {
-                return propertySignature(
-                    camelize ? camel(prop) : prop,
-                    t.tsTypeAnnotation(
-                        t.tsTypeReference(
-                            t.identifier(uniqUnionTypes[0])
-                        )
-                    ),
-                    isOptional
-                );
-            } else {
-                return propertySignature(
-                    camelize ? camel(prop) : prop,
-                    t.tsTypeAnnotation(
-                        t.tsUnionType(
-                            uniqUnionTypes.map(typ =>
-                                t.tsTypeReference(
-                                    t.identifier(typ)
-                                )
-                            )
-                        )
-                    ),
-                    isOptional
-                );
-            }
-
-        }
-
-        try {
-            getPropertyType(jsonschema, prop);
-        } catch (e) {
-            console.log(e);
-            console.log(jsonschema, prop);
-        }
-
-        const { type, optional } = getPropertyType(jsonschema, prop);
-        return propertySignature(
-            camelize ? camel(prop) : prop,
-            t.tsTypeAnnotation(
-                type
-            ),
-            optional
-        );
+      return extracted(jsonschema, prop, camelize);
     });
     const params = keys.map(prop => {
         return t.objectProperty(
