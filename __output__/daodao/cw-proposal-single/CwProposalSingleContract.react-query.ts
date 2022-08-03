@@ -51,7 +51,7 @@ export function useCwProposalSingleListVotesQuery({
   args,
   options
 }: CwProposalSingleListVotesQuery) {
-  return useQuery<ListVotesResponse, Error, ListVotesResponse, (string | undefined)[]>(["cwProposalSingleListVotes", client.contractAddress], () => client.listVotes({
+  return useQuery<ListVotesResponse, Error, ListVotesResponse, (string | undefined)[]>(["cwProposalSingleListVotes", client.contractAddress, JSON.stringify(args)], () => client.listVotes({
     limit: args.limit,
     proposalId: args.proposalId,
     startAfter: args.startAfter
@@ -70,7 +70,7 @@ export function useCwProposalSingleVoteQuery({
   args,
   options
 }: CwProposalSingleVoteQuery) {
-  return useQuery<VoteResponse, Error, VoteResponse, (string | undefined)[]>(["cwProposalSingleVote", client.contractAddress], () => client.vote({
+  return useQuery<VoteResponse, Error, VoteResponse, (string | undefined)[]>(["cwProposalSingleVote", client.contractAddress, JSON.stringify(args)], () => client.vote({
     proposalId: args.proposalId,
     voter: args.voter
   }), options);
@@ -98,7 +98,7 @@ export function useCwProposalSingleReverseProposalsQuery({
   args,
   options
 }: CwProposalSingleReverseProposalsQuery) {
-  return useQuery<ReverseProposalsResponse, Error, ReverseProposalsResponse, (string | undefined)[]>(["cwProposalSingleReverseProposals", client.contractAddress], () => client.reverseProposals({
+  return useQuery<ReverseProposalsResponse, Error, ReverseProposalsResponse, (string | undefined)[]>(["cwProposalSingleReverseProposals", client.contractAddress, JSON.stringify(args)], () => client.reverseProposals({
     limit: args.limit,
     startBefore: args.startBefore
   }), options);
@@ -116,7 +116,7 @@ export function useCwProposalSingleListProposalsQuery({
   args,
   options
 }: CwProposalSingleListProposalsQuery) {
-  return useQuery<ListProposalsResponse, Error, ListProposalsResponse, (string | undefined)[]>(["cwProposalSingleListProposals", client.contractAddress], () => client.listProposals({
+  return useQuery<ListProposalsResponse, Error, ListProposalsResponse, (string | undefined)[]>(["cwProposalSingleListProposals", client.contractAddress, JSON.stringify(args)], () => client.listProposals({
     limit: args.limit,
     startAfter: args.startAfter
   }), options);
@@ -133,7 +133,7 @@ export function useCwProposalSingleProposalQuery({
   args,
   options
 }: CwProposalSingleProposalQuery) {
-  return useQuery<ProposalResponse, Error, ProposalResponse, (string | undefined)[]>(["cwProposalSingleProposal", client.contractAddress], () => client.proposal({
+  return useQuery<ProposalResponse, Error, ProposalResponse, (string | undefined)[]>(["cwProposalSingleProposal", client.contractAddress, JSON.stringify(args)], () => client.proposal({
     proposalId: args.proposalId
   }), options);
 }

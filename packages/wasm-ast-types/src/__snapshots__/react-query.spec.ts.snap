@@ -1080,7 +1080,7 @@ export function useSg721BurnMutation({
 export interface Sg721MintMutation {
   client: Sg721Client;
   options?: Omit<UseMutationOptions<ExecuteResult, Error, Pick<Sg721MintMutation, \\"args\\">>, \\"mutationFn\\">;
-  args: {};
+  args: MintMsgForEmpty;
 }
 export function useSg721MintMutation({
   client,

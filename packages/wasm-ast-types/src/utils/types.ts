@@ -1,6 +1,7 @@
 import * as t from '@babel/types';
 import { camel } from 'case';
 import { propertySignature } from './babel';
+import { TSTypeAnnotation } from '@babel/types';
 
 const getTypeStrFromRef = ($ref) => {
     switch ($ref) {
@@ -14,7 +15,7 @@ const getTypeStrFromRef = ($ref) => {
     }
 }
 
-const getTypeFromRef = ($ref) => {
+export const getTypeFromRef = ($ref) => {
     switch ($ref) {
         case '#/definitions/Binary':
             return t.tsTypeReference(t.identifier('Binary'))
@@ -142,7 +143,7 @@ export const getPropertyType = (schema, prop) => {
     return { type, optional };
 };
 
-function extracted(jsonschema: any, prop: string, camelize: boolean) {
+export function getPropertySignatureFromProp(jsonschema: any, prop: string, camelize: boolean) {
   if (jsonschema.properties[prop].type === 'object') {
     if (jsonschema.properties[prop].title) {
       return propertySignature(
@@ -243,13 +244,27 @@ function extracted(jsonschema: any, prop: string, camelize: boolean) {
   );
 }
 
+export const getParamsTypeAnnotation = (jsonschema: any, camelize: boolean = true): t.TSTypeAnnotation => {
+  const keys = Object.keys(jsonschema.properties ?? {});
+  if (!keys.length) return undefined;
+
+  const typedParams = keys.map(prop => getPropertySignatureFromProp(jsonschema, prop, camelize));
+
+  return t.tsTypeAnnotation(
+    t.tsTypeLiteral(
+      [
+        ...typedParams
+      ]
+    )
+  )
+}
+
 export const createTypedObjectParams = (jsonschema: any, camelize: boolean = true): t.ObjectPattern => {
     const keys = Object.keys(jsonschema.properties ?? {});
     if (!keys.length) return;
 
-    const typedParams = keys.map(prop => {
-      return extracted(jsonschema, prop, camelize);
-    });
+  // const typedParams = keys.map(prop => getPropertySignatureFromProp(jsonschema, prop, camelize));
+
     const params = keys.map(prop => {
         return t.objectProperty(
             camelize ? t.identifier(camel(prop)) : t.identifier(prop),
@@ -264,13 +279,15 @@ export const createTypedObjectParams = (jsonschema: any, camelize: boolean = tru
             ...params
         ]
     );
-    obj.typeAnnotation = t.tsTypeAnnotation(
-        t.tsTypeLiteral(
-            [
-                ...typedParams
-            ]
-        )
-    );
+
+    obj.typeAnnotation = getParamsTypeAnnotation(jsonschema, camelize)
+    // obj.typeAnnotation = t.tsTypeAnnotation(
+    //     t.tsTypeLiteral(
+    //         [
+    //             ...typedParams
+    //         ]
+    //     )
+    // );
 
     return obj;
 };

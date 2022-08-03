@@ -20,7 +20,7 @@ export function useCwNamedGroupsIsAddressInGroupQuery({
   args,
   options
 }: CwNamedGroupsIsAddressInGroupQuery) {
-  return useQuery<IsAddressInGroupResponse, Error, IsAddressInGroupResponse, (string | undefined)[]>(["cwNamedGroupsIsAddressInGroup", client.contractAddress], () => client.isAddressInGroup({
+  return useQuery<IsAddressInGroupResponse, Error, IsAddressInGroupResponse, (string | undefined)[]>(["cwNamedGroupsIsAddressInGroup", client.contractAddress, JSON.stringify(args)], () => client.isAddressInGroup({
     address: args.address,
     group: args.group
   }), options);
@@ -39,7 +39,7 @@ export function useCwNamedGroupsListAddressesQuery({
   args,
   options
 }: CwNamedGroupsListAddressesQuery) {
-  return useQuery<ListAddressesResponse, Error, ListAddressesResponse, (string | undefined)[]>(["cwNamedGroupsListAddresses", client.contractAddress], () => client.listAddresses({
+  return useQuery<ListAddressesResponse, Error, ListAddressesResponse, (string | undefined)[]>(["cwNamedGroupsListAddresses", client.contractAddress, JSON.stringify(args)], () => client.listAddresses({
     group: args.group,
     limit: args.limit,
     offset: args.offset
@@ -59,7 +59,7 @@ export function useCwNamedGroupsListGroupsQuery({
   args,
   options
 }: CwNamedGroupsListGroupsQuery) {
-  return useQuery<ListGroupsResponse, Error, ListGroupsResponse, (string | undefined)[]>(["cwNamedGroupsListGroups", client.contractAddress], () => client.listGroups({
+  return useQuery<ListGroupsResponse, Error, ListGroupsResponse, (string | undefined)[]>(["cwNamedGroupsListGroups", client.contractAddress, JSON.stringify(args)], () => client.listGroups({
     address: args.address,
     limit: args.limit,
     offset: args.offset

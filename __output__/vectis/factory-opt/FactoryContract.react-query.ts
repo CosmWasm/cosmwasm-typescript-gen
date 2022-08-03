@@ -55,7 +55,7 @@ export function useFactoryCodeIdQuery({
   args,
   options
 }: FactoryCodeIdQuery) {
-  return useQuery<CodeIdResponse | undefined, Error, CodeIdResponse, (string | undefined)[]>(["factoryCodeId", client?.contractAddress], () => client ? client.codeId({
+  return useQuery<CodeIdResponse | undefined, Error, CodeIdResponse, (string | undefined)[]>(["factoryCodeId", client?.contractAddress, JSON.stringify(args)], () => client ? client.codeId({
     ty: args.ty
   }) : undefined, { ...options,
     enabled: !!client && options?.enabled
@@ -75,7 +75,7 @@ export function useFactoryWalletsOfQuery({
   args,
   options
 }: FactoryWalletsOfQuery) {
-  return useQuery<WalletsOfResponse | undefined, Error, WalletsOfResponse, (string | undefined)[]>(["factoryWalletsOf", client?.contractAddress], () => client ? client.walletsOf({
+  return useQuery<WalletsOfResponse | undefined, Error, WalletsOfResponse, (string | undefined)[]>(["factoryWalletsOf", client?.contractAddress, JSON.stringify(args)], () => client ? client.walletsOf({
     limit: args.limit,
     startAfter: args.startAfter,
     user: args.user
@@ -96,7 +96,7 @@ export function useFactoryWalletsQuery({
   args,
   options
 }: FactoryWalletsQuery) {
-  return useQuery<WalletsResponse | undefined, Error, WalletsResponse, (string | undefined)[]>(["factoryWallets", client?.contractAddress], () => client ? client.wallets({
+  return useQuery<WalletsResponse | undefined, Error, WalletsResponse, (string | undefined)[]>(["factoryWallets", client?.contractAddress, JSON.stringify(args)], () => client ? client.wallets({
     limit: args.limit,
     startAfter: args.startAfter
   }) : undefined, { ...options,

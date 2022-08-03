@@ -19,7 +19,7 @@ export function useMinterMintCountQuery({
   args,
   options
 }: MinterMintCountQuery) {
-  return useQuery<MintCountResponse, Error, MintCountResponse, (string | undefined)[]>(["minterMintCount", client.contractAddress], () => client.mintCount({
+  return useQuery<MintCountResponse, Error, MintCountResponse, (string | undefined)[]>(["minterMintCount", client.contractAddress, JSON.stringify(args)], () => client.mintCount({
     address: args.address
   }), options);
 }

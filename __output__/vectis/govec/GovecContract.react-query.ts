@@ -19,7 +19,7 @@ export function useGovecCanExecuteRelayQuery({
   args,
   options
 }: GovecCanExecuteRelayQuery) {
-  return useQuery<CanExecuteRelayResponse, Error, CanExecuteRelayResponse, (string | undefined)[]>(["govecCanExecuteRelay", client.contractAddress], () => client.canExecuteRelay({
+  return useQuery<CanExecuteRelayResponse, Error, CanExecuteRelayResponse, (string | undefined)[]>(["govecCanExecuteRelay", client.contractAddress, JSON.stringify(args)], () => client.canExecuteRelay({
     sender: args.sender
   }), options);
 }

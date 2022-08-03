@@ -30,7 +30,7 @@ export function useCW4GroupMemberQuery({
   args,
   options
 }: CW4GroupMemberQuery) {
-  return useQuery<MemberResponse, Error, MemberResponse, (string | undefined)[]>(["cW4GroupMember", client.contractAddress], () => client.member({
+  return useQuery<MemberResponse, Error, MemberResponse, (string | undefined)[]>(["cW4GroupMember", client.contractAddress, JSON.stringify(args)], () => client.member({
     addr: args.addr,
     atHeight: args.atHeight
   }), options);
@@ -48,7 +48,7 @@ export function useCW4GroupListMembersQuery({
   args,
   options
 }: CW4GroupListMembersQuery) {
-  return useQuery<ListMembersResponse, Error, ListMembersResponse, (string | undefined)[]>(["cW4GroupListMembers", client.contractAddress], () => client.listMembers({
+  return useQuery<ListMembersResponse, Error, ListMembersResponse, (string | undefined)[]>(["cW4GroupListMembers", client.contractAddress, JSON.stringify(args)], () => client.listMembers({
     limit: args.limit,
     startAfter: args.startAfter
   }), options);

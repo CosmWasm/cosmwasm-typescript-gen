@@ -49,7 +49,7 @@ export function useFactoryCodeIdQuery({
   args,
   options
 }: FactoryCodeIdQuery) {
-  return useQuery<CodeIdResponse, Error, CodeIdResponse, (string | undefined)[]>(["factoryCodeId", client.contractAddress], () => client.codeId({
+  return useQuery<CodeIdResponse, Error, CodeIdResponse, (string | undefined)[]>(["factoryCodeId", client.contractAddress, JSON.stringify(args)], () => client.codeId({
     ty: args.ty
   }), options);
 }
@@ -67,7 +67,7 @@ export function useFactoryWalletsOfQuery({
   args,
   options
 }: FactoryWalletsOfQuery) {
-  return useQuery<WalletsOfResponse, Error, WalletsOfResponse, (string | undefined)[]>(["factoryWalletsOf", client.contractAddress], () => client.walletsOf({
+  return useQuery<WalletsOfResponse, Error, WalletsOfResponse, (string | undefined)[]>(["factoryWalletsOf", client.contractAddress, JSON.stringify(args)], () => client.walletsOf({
     limit: args.limit,
     startAfter: args.startAfter,
     user: args.user
@@ -86,7 +86,7 @@ export function useFactoryWalletsQuery({
   args,
   options
 }: FactoryWalletsQuery) {
-  return useQuery<WalletsResponse, Error, WalletsResponse, (string | undefined)[]>(["factoryWallets", client.contractAddress], () => client.wallets({
+  return useQuery<WalletsResponse, Error, WalletsResponse, (string | undefined)[]>(["factoryWallets", client.contractAddress, JSON.stringify(args)], () => client.wallets({
     limit: args.limit,
     startAfter: args.startAfter
   }), options);

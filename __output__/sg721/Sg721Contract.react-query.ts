@@ -40,7 +40,7 @@ export function useSg721AllTokensQuery({
   args,
   options
 }: Sg721AllTokensQuery) {
-  return useQuery<AllTokensResponse, Error, AllTokensResponse, (string | undefined)[]>(["sg721AllTokens", client.contractAddress], () => client.allTokens({
+  return useQuery<AllTokensResponse, Error, AllTokensResponse, (string | undefined)[]>(["sg721AllTokens", client.contractAddress, JSON.stringify(args)], () => client.allTokens({
     limit: args.limit,
     startAfter: args.startAfter
   }), options);
@@ -59,7 +59,7 @@ export function useSg721TokensQuery({
   args,
   options
 }: Sg721TokensQuery) {
-  return useQuery<TokensResponse, Error, TokensResponse, (string | undefined)[]>(["sg721Tokens", client.contractAddress], () => client.tokens({
+  return useQuery<TokensResponse, Error, TokensResponse, (string | undefined)[]>(["sg721Tokens", client.contractAddress, JSON.stringify(args)], () => client.tokens({
     limit: args.limit,
     owner: args.owner,
     startAfter: args.startAfter
@@ -78,7 +78,7 @@ export function useSg721AllNftInfoQuery({
   args,
   options
 }: Sg721AllNftInfoQuery) {
-  return useQuery<AllNftInfoResponse, Error, AllNftInfoResponse, (string | undefined)[]>(["sg721AllNftInfo", client.contractAddress], () => client.allNftInfo({
+  return useQuery<AllNftInfoResponse, Error, AllNftInfoResponse, (string | undefined)[]>(["sg721AllNftInfo", client.contractAddress, JSON.stringify(args)], () => client.allNftInfo({
     includeExpired: args.includeExpired,
     tokenId: args.tokenId
   }), options);
@@ -95,7 +95,7 @@ export function useSg721NftInfoQuery({
   args,
   options
 }: Sg721NftInfoQuery) {
-  return useQuery<NftInfoResponse, Error, NftInfoResponse, (string | undefined)[]>(["sg721NftInfo", client.contractAddress], () => client.nftInfo({
+  return useQuery<NftInfoResponse, Error, NftInfoResponse, (string | undefined)[]>(["sg721NftInfo", client.contractAddress, JSON.stringify(args)], () => client.nftInfo({
     tokenId: args.tokenId
   }), options);
 }
@@ -134,7 +134,7 @@ export function useSg721AllOperatorsQuery({
   args,
   options
 }: Sg721AllOperatorsQuery) {
-  return useQuery<AllOperatorsResponse, Error, AllOperatorsResponse, (string | undefined)[]>(["sg721AllOperators", client.contractAddress], () => client.allOperators({
+  return useQuery<AllOperatorsResponse, Error, AllOperatorsResponse, (string | undefined)[]>(["sg721AllOperators", client.contractAddress, JSON.stringify(args)], () => client.allOperators({
     includeExpired: args.includeExpired,
     limit: args.limit,
     owner: args.owner,
@@ -154,7 +154,7 @@ export function useSg721ApprovalsQuery({
   args,
   options
 }: Sg721ApprovalsQuery) {
-  return useQuery<ApprovalsResponse, Error, ApprovalsResponse, (string | undefined)[]>(["sg721Approvals", client.contractAddress], () => client.approvals({
+  return useQuery<ApprovalsResponse, Error, ApprovalsResponse, (string | undefined)[]>(["sg721Approvals", client.contractAddress, JSON.stringify(args)], () => client.approvals({
     includeExpired: args.includeExpired,
     tokenId: args.tokenId
   }), options);
@@ -173,7 +173,7 @@ export function useSg721ApprovalQuery({
   args,
   options
 }: Sg721ApprovalQuery) {
-  return useQuery<ApprovalResponse, Error, ApprovalResponse, (string | undefined)[]>(["sg721Approval", client.contractAddress], () => client.approval({
+  return useQuery<ApprovalResponse, Error, ApprovalResponse, (string | undefined)[]>(["sg721Approval", client.contractAddress, JSON.stringify(args)], () => client.approval({
     includeExpired: args.includeExpired,
     spender: args.spender,
     tokenId: args.tokenId
@@ -192,7 +192,7 @@ export function useSg721OwnerOfQuery({
   args,
   options
 }: Sg721OwnerOfQuery) {
-  return useQuery<OwnerOfResponse, Error, OwnerOfResponse, (string | undefined)[]>(["sg721OwnerOf", client.contractAddress], () => client.ownerOf({
+  return useQuery<OwnerOfResponse, Error, OwnerOfResponse, (string | undefined)[]>(["sg721OwnerOf", client.contractAddress, JSON.stringify(args)], () => client.ownerOf({
     includeExpired: args.includeExpired,
     tokenId: args.tokenId
   }), options);
